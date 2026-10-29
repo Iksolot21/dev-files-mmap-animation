@@ -12,9 +12,18 @@ from s5_shared import SharedScene
 from s6_framebuffer import FramebufferScene
 
 PARTS = (TitleScene, DevFilesScene, OpenScene, ReadScene, MmapScene, SharedScene, FramebufferScene)
+REVIEW_PARTS = PARTS[:4]
 
 
 class FullVideo(*PARTS):
     def construct(self):
         for part in PARTS:
+            part.construct(self)
+
+
+class TeacherPreview(*REVIEW_PARTS):
+    """Согласованная первая часть: титр, узел /dev, open() и read()."""
+
+    def construct(self):
+        for part in REVIEW_PARTS:
             part.construct(self)

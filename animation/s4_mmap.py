@@ -54,12 +54,10 @@ class MmapScene(BaseScene):
 
         self.play(FadeIn(code), FadeIn(file_panel), FadeIn(file_pages), FadeIn(file_hint),
                   self.show_mode(), run_time=0.9)
-        self.say("Открываем обычный файл `data.bin`")
-        self.pause(0.65)
 
         # mmap устанавливает соответствие диапазона файлу; страница ещё не загружена.
         map_highlight = code.highlight(1)
-        self.say("`mmap` связывает адреса процесса с файлом",
+        self.say("`mmap` связывает адреса с открытым `data.bin`",
                  FadeIn(map_highlight), FadeIn(vma_panel), FadeIn(vma_info),
                  LaggedStart(*[FadeIn(page, scale=0.85) for page in virtual_pages], lag_ratio=0.12),
                  run_time=0.9)
@@ -99,17 +97,14 @@ class MmapScene(BaseScene):
         mapped = mmap_page_cell("1", USER).move_to(virtual_pages[1])
         link = poly_arrow(vma_panel.get_right() + RIGHT * 0.06,
                           cache_panel.get_left() + LEFT * 0.06, color=DATA)
-        self.say("Теперь адрес указывает на страницу в RAM",
-                 FadeOut(fault), FadeOut(chosen),
+        result = mono("c = 'B'", 22, DATA).move_to([0, -1.65, 0])
+        self.say("После fault чтение страницы в RAM возвращает B",
+                 ReplacementTransform(fault, result), FadeOut(chosen),
                  ReplacementTransform(virtual_pages[1], mapped), grow(link),
                  self.mode(False), run_time=0.85)
         self.pause(0.65)
 
         # Следующее чтение уже использует созданное отображение.
-        result = mono("c = 'B'", 22, DATA).move_to([0, -1.65, 0])
-        self.say("Чтение продолжается и возвращает байт B",
-                 FadeIn(result, shift=UP * 0.15), run_time=0.55)
-        self.pause(0.65)
         next_read = capsule("p[5001]", USER, size=18).move_to([0, -1.65, 0])
         self.say("Повторное чтение идёт без нового fault",
                  FadeOut(result), FadeIn(next_read),

@@ -42,9 +42,7 @@ class SharedScene(BaseScene):
 
         self.play(FadeIn(a), FadeIn(b), FadeIn(ram), FadeIn(a_mode), FadeIn(b_mode),
                   FadeIn(a_code), FadeIn(b_code), FadeIn(page_b), FadeIn(file_group),
-                  run_time=0.85)
-        self.say("A и B видят одну страницу в памяти")
-        self.play(grow(a_to_ram), grow(ram_to_b), run_time=0.8)
+                  grow(a_to_ram), grow(ram_to_b), run_time=1.0)
         self.pause(0.7)
 
         # Общая запись видна другому отображению ещё до записи страницы на диск.
@@ -53,10 +51,9 @@ class SharedScene(BaseScene):
         page_x = shared_value("X", DIRTY, 0, -0.2)
         self.say("A меняет байт B на X в общей странице", FadeIn(write_x),
                  run_time=0.5)
-        self.play(write_x.animate.move_to(page_b), run_time=0.75)
+        self.play(write_x.animate.move_to(page_b), run_time=0.65)
         self.play(FadeOut(write_x), ReplacementTransform(page_b, page_x),
                   FadeIn(dirty), run_time=0.5)
-        self.pause(0.45)
 
         b_result = mono("q[5000] → 'X'", 18, DATA).move_to(b_code)
         self.say("B уже видит X; на диске пока B",
@@ -73,11 +70,14 @@ class SharedScene(BaseScene):
         disk_x = mono("data.bin : X", 21, DATA).move_to(disk)
         self.play(ReplacementTransform(disk_label, disk_x), FadeOut(dirty),
                   FadeOut(sync_label), run_time=0.6)
-        self.pause(0.55)
+        self.pause(0.25)
 
-        # На втором экране путь MAP_PRIVATE нарочно оставлен трёхблочным.
-        self.say("Теперь B создаёт личное отображение")
-        self.clear_stage(run_time=0.65)
+        # Три карточки и надпись MAP_PRIVATE объясняют переход без отдельной подписи.
+        self.clear_stage(run_time=0.5)
+        self.hold_caption()
+        self.remove(self.caption)
+        self.caption = None
+        self.caption_visible_at = None
 
         file_private = shared_card("файл · data.bin", DATA, -4.8)
         file_x = shared_value("X", DATA, -4.8, -0.2)
@@ -90,20 +90,16 @@ class SharedScene(BaseScene):
 
         self.play(FadeIn(file_private), FadeIn(file_x), FadeIn(cache_private),
                   FadeIn(cache_x), FadeIn(private), FadeIn(private_empty),
-                  FadeIn(private_mode), FadeIn(command), run_time=0.8)
-        self.pause(0.6)
+                  FadeIn(private_mode), FadeIn(command), run_time=0.7)
 
         copy_arrow = poly_arrow(cache_private.get_right() + RIGHT * 0.06,
                                 private.get_left() + LEFT * 0.06, color=PINK)
         copied_x = shared_value("X", PINK, 4.8, -0.2)
-        self.say("При записи B получает копию страницы",
-                 grow(copy_arrow), run_time=0.65)
-        self.play(ReplacementTransform(private_empty, copied_x), run_time=0.75)
-        self.pause(0.5)
-
         copied_y = shared_value("Y", PINK, 4.8, -0.2)
-        self.say("У B теперь Y, а у A и в файле – X",
-                 ReplacementTransform(copied_x, copied_y),
-                 Flash(copied_y, color=PINK, flash_radius=0.7), run_time=0.8)
-        self.pause(1.2)
-        self.clear_all()
+        self.say("B пишет Y в личную копию; A и файл сохраняют X",
+                 grow(copy_arrow), ReplacementTransform(private_empty, copied_x),
+                 run_time=0.8)
+        self.play(ReplacementTransform(copied_x, copied_y),
+                  Flash(copied_y, color=PINK, flash_radius=0.7), run_time=0.8)
+        self.pause(0.2)
+        self.clear_all(run_time=0.45)

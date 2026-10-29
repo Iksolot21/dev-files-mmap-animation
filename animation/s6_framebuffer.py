@@ -49,9 +49,6 @@ class FramebufferScene(BaseScene):
 
         self.play(FadeIn(code), FadeIn(memory), FadeIn(driver), FadeIn(vram),
                   FadeIn(monitor), FadeIn(label), self.show_mode(), run_time=0.8)
-        self.say("`/dev/fb0` – пример устройства с видеопамятью",
-                 run_time=0.6)
-        self.pause(0.6)
 
         info = capsule("размер и формат", DRIVER, size=17).move_to(code.lines[1])
         self.say("`ioctl` узнаёт размер и формат экрана",
@@ -79,8 +76,8 @@ class FramebufferScene(BaseScene):
                 px.animate.set_fill(color if HEART[r][c] == "X" else "#1d2a44", 1)
                 for c, px in enumerate(monitor.px[r])
             ]))
-        self.play(LaggedStart(*rows, lag_ratio=0.14), run_time=2.0)
-        self.pause(1.0)
+        self.play(LaggedStart(*rows, lag_ratio=0.14), run_time=1.4)
+        self.pause(0.8)
 
         self.clear_stage(run_time=0.45)
         title = txt("Три маршрута доступа", 34, TEXT, weight=BOLD).move_to([0, 2.25, 0])
